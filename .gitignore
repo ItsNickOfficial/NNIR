@@ -1,129 +1,48 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+# Import the necessary libraries
+import tensorflow as tf
+import keras
+from tensorflow.keras import layers
 
-# C extensions
-*.so
+# Specify the input. If not, it can be problematic when we try to calculate things.
+inputs = keras.Input(shape=(784,), name="pixels")
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# Create the architecture of a neural network with
+# 3 layers (number of neurons on each layer, activation function, name(not mandatory))
+x = layers.Dense(64, activation="relu", name="layer1")(inputs)
+x = layers.Dense(64, activation="relu", name="hidden_layer")(x)
+outputs = layers.Dense(10, activation="softmax", name="predicted_outputs")(x)
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+model = keras.Model(inputs=inputs, outputs=outputs)
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# Load the mnist data
+(x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
+# Preprocess the data
+x_train = x_train.reshape(60000, 784).astype("float32") / 255
+x_test = x_test.reshape(10000, 784).astype("float32") / 255
 
-# Translations
-*.mo
-*.pot
+y_train = y_train.astype("float32")
+y_test = y_test.astype("float32")
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+# Reserve 10,000 samples for validation
+x_val = x_train[-10000:]
+y_val = y_train[-10000:]
+x_train = x_train[:-10000]
+y_train = y_train[:-10000]
 
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
+# Training config
+model.compile(
+    # Optimizer
+    optimizer=keras.optimizers.RMSprop(),
+    # Loss function
+    loss=keras.losses.SparseCategoricalCrossentropy(),
+    # A list of metrics for monitoring
+    metrics=[keras.metrics.SparseCategoricalAccuracy()],
+)
+# Train the model by dividing the data into batches and keep training for a set
+# number of epochs
+history = model.fit(x_train, 
+                    y_train, 
+                    batch_size=50, 
+                    epochs=10, 
+                    validation_data=(x_val, y_val))
