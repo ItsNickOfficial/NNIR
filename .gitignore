@@ -41,7 +41,7 @@ model.compile(
 )
 # Train the model by dividing the data into batches and keep training for a set
 # number of epochs
-history = model.fit(x_train, 
+training = model.fit(x_train, 
                     y_train, 
                     batch_size=50, 
                     epochs=10, 
