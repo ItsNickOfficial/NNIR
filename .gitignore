@@ -7,9 +7,9 @@ from tensorflow.keras import layers
 inputs = keras.Input(shape=(784,), name="pixels")
 
 # Create the architecture of a neural network with
-# 3 layers (number of neurons on each layer, activation function, name(not mandatory))
-x = layers.Dense(64, activation="relu", name="layer1")(inputs)
-x = layers.Dense(64, activation="relu", name="hidden_layer")(x)
+# 3 layers (number of neurons on each layer, activation function, name(optional))
+x = layers.Dense(65, activation="relu", name="layer1")(inputs)
+x = layers.Dense(65, activation="relu", name="hidden_layer")(x)
 outputs = layers.Dense(10, activation="softmax", name="predicted_outputs")(x)
 
 model = keras.Model(inputs=inputs, outputs=outputs)
@@ -33,7 +33,7 @@ y_train = y_train[:-10000]
 # Training config
 model.compile(
     # Optimizer
-    optimizer=keras.optimizers.RMSprop(),
+    optimizer=keras.optimizers.RMSprop(learning_rate=0.001),
     # Loss function
     loss=keras.losses.SparseCategoricalCrossentropy(),
     # A list of metrics for monitoring
